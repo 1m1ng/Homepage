@@ -1,0 +1,62 @@
+---
+export interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className } = Astro.props;
+---
+
+<h1 class:list={['typewriter-container inline-block', className]}>
+  <span id="typewriter-text" class="typewriter-text">{text}</span>
+</h1>
+
+<style>
+  .typewriter-container {
+    position: relative;
+  }
+  
+  .typewriter-text {
+    overflow: hidden;
+    border-right: 3px solid rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    display: inline-block;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    background: linear-gradient(135deg, #e0f2fe, #a5f3fc, #c4b5fd) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: 
+      typing 2s steps(20, end) forwards,
+      blink 0.75s step-end infinite;
+  }
+  
+  @keyframes typing {
+    from { 
+      width: 0;
+    }
+    to { 
+      width: 100%;
+    }
+  }
+  
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+  
+  /* 打字完成后停止光标闪烁 */
+  .typewriter-text.done {
+    border-color: transparent;
+  }
+</style>
+
+<script>
+  // 打字完成后的处理
+  setTimeout(() => {
+    const element = document.getElementById('typewriter-text');
+    if (element) {
+      // 可以在这里添加完成后的效果
+    }
+  }, 2500);
+</script>

@@ -1,0 +1,258 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Avatar from '../components/Avatar.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import ParticleBackground from '../components/ParticleBackground.astro';
+import ThreeBackground from '../components/ThreeBackground.astro';
+import TypeWriter from '../components/TypeWriter.astro';
+import MouseTrail from '../components/MouseTrail.astro';
+
+const socialLinks = [
+  {
+    name: 'GitHub',
+    url: 'https://github.com/1m1ng',
+    icon: 'github',
+    color: 'blue',
+  },
+  {
+    name: '小鸡窝',
+    url: 'https://dashboard.1m1ng.net',
+    icon: 'server',
+    color: 'purple',
+  },
+  {
+    name: 'Bilibili',
+    url: 'https://space.bilibili.com/176271763',
+    icon: 'bilibili',
+    color: 'cyan',
+  },
+];
+---
+
+<Layout title="灰机喵喵喵 の 个人主页">
+  <!-- 3D 背景 -->
+  <ThreeBackground />
+  
+  <!-- 粒子效果 -->
+  <ParticleBackground />
+  
+  <!-- 鼠标轨迹 -->
+  <MouseTrail />
+
+  <!-- 主背景图 -->
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-20">
+    <div 
+      class="w-full h-full bg-tilt"
+      id="bgTilt"
+      style="background-image: url('/background.jpg'); background-size: 120%; background-position: center; background-repeat: no-repeat; transition: background-position 0.3s ease-out;"
+    ></div>
+    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black/70 via-black/50 to-transparent pointer-events-none"></div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="relative z-10 min-h-screen flex items-start pt-32">
+    <div class="w-2/3 h-full flex flex-col items-center justify-start px-8 lg:px-12 py-8">
+        
+        <!-- 时间显示在卡片上方 -->
+        <div class="time-display mb-8 animate-fade-in-up">
+          <div id="clock" class="time-text">
+            <span class="time-digit" data-type="hours">00</span><span class="time-colon">:</span><span class="time-digit" data-type="minutes">00</span><span class="time-colon">:</span><span class="time-digit" data-type="seconds">00</span>
+          </div>
+          <div id="date" class="date-text">----年--月--日</div>
+        </div>
+        
+        <!-- 主卡片 -->
+        <div class="glass-card p-10 lg:p-12 rounded-3xl animate-fade-in-up">
+          
+          <!-- 头像和名字 -->
+          <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+            <Avatar 
+              src="https://www.gravatar.com/avatar/ee6bfa6ae8b5e67dd429e5658ad1ab8d?s=256&d=identicon"
+              alt="灰机喵喵喵"
+            />
+            
+            <div class="text-center md:text-left">
+              <TypeWriter text="灰机喵喵喵" class="text-4xl lg:text-6xl font-bold tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200" />
+              <p class="text-gray-300 text-lg lg:text-xl font-light tracking-widest uppercase animate-fade-in-up" style="animation-delay: 0.5s; opacity: 0;">
+                一只会点编程又会喵喵喵的大学牲
+              </p>
+            </div>
+          </div>
+
+          <!-- 分割线 -->
+          <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent my-8 animate-fade-in-up" style="animation-delay: 0.3s; opacity: 0;"></div>
+          
+          <!-- 简介 -->
+          <p class="text-gray-300 text-lg leading-relaxed mb-8 animate-fade-in-up" style="animation-delay: 0.4s; opacity: 0;">
+            生命在于折腾，热衷于捣腾小鸡，拥有属于自己的小鸡窝。既菜又爱玩，倒头就睡觉。<br/>
+            愿这生你我一切安好，少点404，多点502。喵喵喵！
+          </p>
+
+          <!-- 社交链接 -->
+          <div class="animate-fade-in-up" style="animation-delay: 0.5s; opacity: 0;">
+            <SocialLinks links={socialLinks} />
+          </div>
+        </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="fixed bottom-4 left-0 right-0 text-center text-gray-400/60 text-sm z-20">
+    <p class="animate-fade-in-up" style="animation-delay: 1.2s; opacity: 0;">
+      Made with 💜 by 灰机喵喵喵 · © 2025
+    </p>
+  </footer>
+</Layout>
+
+<script>
+  // 背景视差效果
+  const bgElement = document.querySelector('#bgTilt') as HTMLElement;
+  
+  if (bgElement) {
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5);
+      const y = (e.clientY / window.innerHeight - 0.5);
+      
+      const moveX = 50 + x * 5;
+      const moveY = 50 + y * 5;
+      
+      bgElement.style.backgroundPosition = `${moveX}% ${moveY}%`;
+    });
+  }
+
+  // 简洁优雅的时钟
+  let lastSeconds = '';
+  
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const clockEl = document.getElementById('clock');
+    const dateEl = document.getElementById('date');
+    
+    if (clockEl) {
+      const hoursEl = clockEl.querySelector('[data-type="hours"]');
+      const minutesEl = clockEl.querySelector('[data-type="minutes"]');
+      const secondsEl = clockEl.querySelector('[data-type="seconds"]');
+      
+      if (hoursEl) hoursEl.textContent = hours;
+      if (minutesEl) minutesEl.textContent = minutes;
+      if (secondsEl) {
+        secondsEl.textContent = seconds;
+        // 每秒添加跳动效果
+        if (seconds !== lastSeconds) {
+          secondsEl.classList.add('pulse');
+          setTimeout(() => secondsEl.classList.remove('pulse'), 200);
+          lastSeconds = seconds;
+        }
+      }
+    }
+    
+    if (dateEl) {
+      dateEl.textContent = now.toLocaleDateString('zh-CN', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        weekday: 'long'
+      });
+    }
+  }
+  
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+
+<style>
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  /* 时间显示样式 */
+  .time-display {
+    font-family: 'Righteous', 'Arial Black', sans-serif;
+    text-align: center;
+  }
+
+  .time-text {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+  }
+
+  .time-digit {
+    font-family: 'Righteous', 'Arial Black', sans-serif;
+    font-size: 10rem;
+    font-weight: 400;
+    letter-spacing: 6px;
+    color: transparent;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 30%, #7dd3fc 60%, #38bdf8 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: gradient-flow 4s ease infinite;
+    text-shadow: 
+      0 0 30px rgba(125, 211, 252, 0.5),
+      0 0 60px rgba(125, 211, 252, 0.3),
+      0 0 90px rgba(56, 189, 248, 0.2);
+    font-variant-numeric: tabular-nums;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 180px;
+    text-align: center;
+    filter: drop-shadow(0 0 15px rgba(125, 211, 252, 0.4));
+  }
+
+  @keyframes gradient-flow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .time-digit[data-type="seconds"] {
+    font-size: 7rem;
+    min-width: 130px;
+    opacity: 0.9;
+  }
+
+  .time-digit.pulse {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 25px rgba(125, 211, 252, 0.7));
+  }
+
+  .time-colon {
+    font-family: 'Righteous', 'Arial Black', sans-serif;
+    font-size: 8rem;
+    font-weight: 400;
+    color: transparent;
+    background: linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin: 0 8px;
+    animation: colon-blink 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.3));
+  }
+
+  @keyframes colon-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .date-text {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: rgba(224, 242, 254, 0.7);
+    margin-top: 16px;
+    letter-spacing: 6px;
+    text-shadow: 0 0 15px rgba(125, 211, 252, 0.3);
+  }
+</style>

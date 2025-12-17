@@ -1,0 +1,105 @@
+---
+export interface Skill {
+  name: string;
+  level: number;
+  color: string;
+}
+
+export interface Props {
+  skills: Skill[];
+}
+
+const { skills } = Astro.props;
+---
+
+<div class="space-y-4">
+  {skills.map((skill, index) => (
+    <div 
+      class="skill-item"
+      style={`animation-delay: ${index * 0.1}s`}
+    >
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-sm text-white/80">{skill.name}</span>
+        <span class="text-xs text-white/60">{skill.level}%</span>
+      </div>
+      <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div 
+          class:list={[
+            'h-full rounded-full bg-gradient-to-r transition-all duration-1000 ease-out skill-bar',
+            skill.color
+          ]}
+          style={`--skill-level: ${skill.level}%`}
+          data-level={skill.level}
+        ></div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .skill-item {
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideIn 0.5s ease-out forwards;
+  }
+  
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .skill-bar {
+    width: 0;
+    animation: fillBar 1.5s ease-out forwards;
+    animation-delay: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .skill-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes fillBar {
+    to {
+      width: var(--skill-level);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+</style>
+
+<script>
+  // 当元素进入视口时触发动画
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  document.querySelectorAll('.skill-item').forEach((item) => {
+    observer.observe(item);
+  });
+</script>

@@ -1,0 +1,146 @@
+---
+// 鼠标轨迹特效组件
+---
+
+<canvas id="mouse-trail" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+<script>
+  class MouseTrail {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private trails: Trail[] = [];
+    private mouseX: number = 0;
+    private mouseY: number = 0;
+    private hue: number = 0;
+
+    constructor() {
+      this.canvas = document.getElementById('mouse-trail') as HTMLCanvasElement;
+      this.ctx = this.canvas.getContext('2d')!;
+      this.init();
+    }
+
+    init() {
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
+      
+      document.addEventListener('mousemove', (e) => {
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+        
+        // 每次移动创建新的轨迹点
+        if (Math.random() > 0.5) {
+          this.trails.push(new Trail(
+            this.mouseX,
+            this.mouseY,
+            this.hue
+          ));
+          this.hue = (this.hue + 1) % 360;
+        }
+      });
+
+      // 点击产生爆炸效果
+      document.addEventListener('click', (e) => {
+        this.createExplosion(e.clientX, e.clientY);
+      });
+
+      this.animate();
+    }
+
+    resize() {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+
+    createExplosion(x: number, y: number) {
+      for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 / 20) * i;
+        const velocity = Math.random() * 5 + 2;
+        this.trails.push(new Trail(
+          x,
+          y,
+          this.hue,
+          Math.cos(angle) * velocity,
+          Math.sin(angle) * velocity,
+          true
+        ));
+      }
+    }
+
+    animate() {
+      // 清除画布（完全透明，不会遮挡背景）
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // 更新并绘制轨迹
+      this.trails = this.trails.filter((trail) => {
+        trail.update();
+        trail.draw(this.ctx);
+        return trail.alpha > 0.01;
+      });
+
+      requestAnimationFrame(() => this.animate());
+    }
+  }
+
+  class Trail {
+    x: number;
+    y: number;
+    hue: number;
+    vx: number;
+    vy: number;
+    alpha: number;
+    size: number;
+    isExplosion: boolean;
+
+    constructor(
+      x: number,
+      y: number,
+      hue: number,
+      vx: number = 0,
+      vy: number = 0,
+      isExplosion: boolean = false
+    ) {
+      this.x = x;
+      this.y = y;
+      this.hue = hue;
+      this.vx = vx || (Math.random() - 0.5) * 2;
+      this.vy = vy || (Math.random() - 0.5) * 2;
+      this.alpha = 1;
+      this.size = isExplosion ? Math.random() * 3 + 1 : Math.random() * 5 + 2;
+      this.isExplosion = isExplosion;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      // 加快淡出速度，因为没有拖尾效果
+      this.alpha -= this.isExplosion ? 0.05 : 0.04;
+      this.size *= 0.96;
+      
+      if (this.isExplosion) {
+        this.vy += 0.1; // 重力效果
+      }
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      
+      // 渐变颜色
+      const gradient = ctx.createRadialGradient(
+        this.x, this.y, 0,
+        this.x, this.y, this.size
+      );
+      gradient.addColorStop(0, `hsla(${this.hue}, 100%, 70%, 1)`);
+      gradient.addColorStop(1, `hsla(${this.hue}, 100%, 50%, 0)`);
+      
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // 初始化鼠标轨迹
+  new MouseTrail();
+</script>
