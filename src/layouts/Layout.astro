@@ -16,7 +16,13 @@ const { title } = Astro.props;
   <meta property="og:title" content={title}>
   <meta property="og:description" content="一只会点编程又会喵喵喵的大学牲">
   <meta property="og:type" content="website">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="color-scheme" content="dark light">
+  <!-- Favicon - 根据主题自动切换 -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" id="dynamic-favicon">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="dynamic-favicon-svg">
+  <link rel="apple-touch-icon" href="/favicon.ico">
+  <!-- 预加载白色 favicon -->
+  <link rel="preload" href="/favicon-white.ico" as="image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
@@ -140,8 +146,26 @@ const { title } = Astro.props;
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
   }
+
+</style>
+
+<script>
+  // 动态切换 favicon 根据系统主题
+  const updateFavicon = () => {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const faviconLink = document.getElementById('dynamic-favicon') as HTMLLinkElement;
+    
+    if (faviconLink) {
+      faviconLink.href = isDark ? '/favicon.ico' : '/favicon-white.ico';
+    }
+  };
   
-  @keyframes shimmer {
+  // 初始化
+  updateFavicon();
+  
+  // 监听系统主题变化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+</script>  @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
