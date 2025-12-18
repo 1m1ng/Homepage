@@ -44,17 +44,19 @@ const socialLinks = [
     <div 
       class="w-full h-full bg-tilt"
       id="bgTilt"
-      style="background-image: url('/background.jpg'); background-size: 120%; background-position: center; background-repeat: no-repeat; transition: background-position 0.3s ease-out;"
+      data-desktop="/background.jpg"
+      data-mobile="/mobile.jpg"
+      style="background-position: center; background-repeat: no-repeat; background-attachment: fixed; transition: background-position 0.3s ease-out;"
     ></div>
     <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black/70 via-black/50 to-transparent pointer-events-none"></div>
   </div>
 
   <!-- 主内容区 -->
-  <main class="relative z-10 min-h-screen flex items-start pt-32">
-    <div class="w-2/3 h-full flex flex-col items-center justify-start px-8 lg:px-12 py-8">
+  <main class="relative z-10 min-h-screen flex items-center md:items-start pt-8 md:pt-32">
+    <div class="w-full md:w-2/3 h-full flex flex-col items-center justify-start px-4 md:px-8 lg:px-12 py-4 md:py-8">
         
         <!-- 时间显示在卡片上方 -->
-        <div class="time-display mb-8 animate-fade-in-up">
+        <div class="time-display mb-4 md:mb-8 animate-fade-in-up">
           <div id="clock" class="time-text">
             <span class="time-digit" data-type="hours">00</span><span class="time-colon">:</span><span class="time-digit" data-type="minutes">00</span><span class="time-colon">:</span><span class="time-digit" data-type="seconds">00</span>
           </div>
@@ -62,28 +64,28 @@ const socialLinks = [
         </div>
         
         <!-- 主卡片 -->
-        <div class="glass-card p-10 lg:p-12 rounded-3xl animate-fade-in-up">
+        <div class="glass-card p-5 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl animate-fade-in-up w-full max-w-2xl">
           
           <!-- 头像和名字 -->
-          <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+          <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8 mb-6 md:mb-8">
             <Avatar 
               src="https://www.gravatar.com/avatar/ee6bfa6ae8b5e67dd429e5658ad1ab8d?s=256&d=identicon"
               alt="灰机喵喵喵"
             />
             
             <div class="text-center md:text-left">
-              <TypeWriter text="灰机喵喵喵" class="text-4xl lg:text-6xl font-bold tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200" />
-              <p class="text-gray-300 text-lg lg:text-xl font-light tracking-widest uppercase animate-fade-in-up" style="animation-delay: 0.5s; opacity: 0;">
+              <TypeWriter text="灰机喵喵喵" class="text-2xl md:text-4xl lg:text-6xl font-bold tracking-tight mb-2 md:mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200" />
+              <p class="text-gray-300 text-sm md:text-lg lg:text-xl font-light tracking-widest uppercase animate-fade-in-up" style="animation-delay: 0.5s; opacity: 0;">
                 一只会点编程又会喵喵喵的大学牲
               </p>
             </div>
           </div>
 
           <!-- 分割线 -->
-          <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent my-8 animate-fade-in-up" style="animation-delay: 0.3s; opacity: 0;"></div>
+          <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent my-4 md:my-8 animate-fade-in-up" style="animation-delay: 0.3s; opacity: 0;"></div>
           
           <!-- 简介 -->
-          <p class="text-gray-300 text-lg leading-relaxed mb-8 animate-fade-in-up" style="animation-delay: 0.4s; opacity: 0;">
+          <p class="text-gray-300 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 animate-fade-in-up" style="animation-delay: 0.4s; opacity: 0;">
             生命在于折腾，热衷于捣腾小鸡，拥有属于自己的小鸡窝。既菜又爱玩，倒头就睡觉。<br/>
             愿这生你我一切安好，少点404，多点502。喵喵喵！
           </p>
@@ -105,16 +107,57 @@ const socialLinks = [
 </Layout>
 
 <script>
-  // 背景视差效果
+  // 背景视差效果和响应式背景设置
   const bgElement = document.querySelector('#bgTilt') as HTMLElement;
   
   if (bgElement) {
+    // 根据图片尺寸和窗口尺寸动态计算最优的background-size
+    const calculateOptimalBackgroundSize = (imgUrl: string) => {
+      const img = new Image();
+      img.onload = () => {
+        const imgAspectRatio = img.width / img.height;
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        
+        // 计算宽度和高度，确保两个方向都能视差移动
+        let widthPercent: number;
+        let heightPercent: number;
+        
+        if (imgAspectRatio > windowAspectRatio) {
+          // 图片相对较宽
+          widthPercent = Math.max(130, (imgAspectRatio / windowAspectRatio) * 110);
+          heightPercent = 100;
+        } else {
+          // 图片相对较高
+          widthPercent = 100;
+          heightPercent = Math.max(130, (windowAspectRatio / imgAspectRatio) * 110);
+        }
+        
+        // 但两个方向都至少留出视差空间
+        widthPercent = Math.max(widthPercent, 120);
+        heightPercent = Math.max(heightPercent, 120);
+        
+        bgElement.style.backgroundSize = `${widthPercent}% ${heightPercent}%`;
+      };
+      img.src = imgUrl;
+    };
+    
+    // 设置初始背景
+    const setBackground = () => {
+      const isMobile = window.innerWidth < 768;
+      const bgImage = isMobile ? bgElement.dataset.mobile : bgElement.dataset.desktop;
+      bgElement.style.backgroundImage = `url('${bgImage}')`;
+      calculateOptimalBackgroundSize(bgImage!);
+    };
+    
+    setBackground();
+    window.addEventListener('resize', setBackground);
+    
     document.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5);
-      const y = (e.clientY / window.innerHeight - 0.5);
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
       
-      const moveX = 50 + x * 5;
-      const moveY = 50 + y * 5;
+      const moveX = 50 + x * 8;
+      const moveY = 50 + y * 8;
       
       bgElement.style.backgroundPosition = `${moveX}% ${moveY}%`;
     });
@@ -187,9 +230,9 @@ const socialLinks = [
 
   .time-digit {
     font-family: 'Righteous', 'Arial Black', sans-serif;
-    font-size: 10rem;
+    font-size: 3rem;
     font-weight: 400;
-    letter-spacing: 6px;
+    letter-spacing: 2px;
     color: transparent;
     background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 30%, #7dd3fc 60%, #38bdf8 100%);
     background-size: 200% 200%;
@@ -203,9 +246,17 @@ const socialLinks = [
     font-variant-numeric: tabular-nums;
     transition: all 0.2s ease;
     display: inline-block;
-    min-width: 180px;
+    min-width: 54px;
     text-align: center;
     filter: drop-shadow(0 0 15px rgba(125, 211, 252, 0.4));
+  }
+
+  @media (min-width: 768px) {
+    .time-digit {
+      font-size: 10rem;
+      letter-spacing: 6px;
+      min-width: 180px;
+    }
   }
 
   @keyframes gradient-flow {
@@ -218,9 +269,16 @@ const socialLinks = [
   }
 
   .time-digit[data-type="seconds"] {
-    font-size: 7rem;
-    min-width: 130px;
+    font-size: 2.2rem;
+    min-width: 40px;
     opacity: 0.9;
+  }
+
+  @media (min-width: 768px) {
+    .time-digit[data-type="seconds"] {
+      font-size: 7rem;
+      min-width: 130px;
+    }
   }
 
   .time-digit.pulse {
@@ -230,15 +288,22 @@ const socialLinks = [
 
   .time-colon {
     font-family: 'Righteous', 'Arial Black', sans-serif;
-    font-size: 8rem;
+    font-size: 2.5rem;
     font-weight: 400;
     color: transparent;
     background: linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    margin: 0 8px;
+    margin: 0 2px;
     animation: colon-blink 1s ease-in-out infinite;
     filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.3));
+  }
+
+  @media (min-width: 768px) {
+    .time-colon {
+      font-size: 8rem;
+      margin: 0 8px;
+    }
   }
 
   @keyframes colon-blink {
@@ -248,11 +313,26 @@ const socialLinks = [
 
   .date-text {
     font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-    font-size: 1.8rem;
+    font-size: 0.9rem;
     font-weight: 300;
     color: rgba(224, 242, 254, 0.7);
-    margin-top: 16px;
-    letter-spacing: 6px;
+    margin-top: 8px;
+    letter-spacing: 2px;
     text-shadow: 0 0 15px rgba(125, 211, 252, 0.3);
+  }
+
+  @media (min-width: 768px) {
+    .date-text {
+      font-size: 1.8rem;
+      margin-top: 16px;
+      letter-spacing: 6px;
+    }
+  }
+
+  /* 手机端隐藏鼠标轨迹效果 */
+  @media (max-width: 767px) {
+    :global(.mouse-trail-canvas) {
+      display: none !important;
+    }
   }
 </style>

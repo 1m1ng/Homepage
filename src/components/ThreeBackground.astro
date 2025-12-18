@@ -53,6 +53,10 @@
     }
 
     createGeometries() {
+      // 判断是否为移动设备，减少几何体数量以优化性能
+      const isMobile = window.innerWidth < 768;
+      const geometryCount = isMobile ? 8 : 20;
+      
       // 创建漂浮的几何体
       const geometryTypes = [
         new THREE.IcosahedronGeometry(1, 0),
@@ -62,7 +66,7 @@
         new THREE.DodecahedronGeometry(0.8, 0),
       ];
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < geometryCount; i++) {
         const geometry = geometryTypes[Math.floor(Math.random() * geometryTypes.length)];
         
         const material = new THREE.MeshPhongMaterial({
@@ -100,8 +104,11 @@
     }
 
     createStars() {
+      // 判断是否为移动设备，减少星星数量
+      const isMobile = window.innerWidth < 768;
+      const starCount = isMobile ? 200 : 500;
+      
       const starGeometry = new THREE.BufferGeometry();
-      const starCount = 500;
       const positions = new Float32Array(starCount * 3);
 
       for (let i = 0; i < starCount * 3; i += 3) {

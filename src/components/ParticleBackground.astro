@@ -36,8 +36,12 @@
         this.mouseY = e.clientY;
       });
 
+      // 判断是否为移动设备，减少粒子数量
+      const isMobile = window.innerWidth < 768;
+      const particleCount = isMobile ? 25 : 50;
+
       // 创建初始粒子
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < particleCount; i++) {
         this.particles.push(new Particle(this.canvas.width, this.canvas.height));
       }
 
